@@ -8,3 +8,4 @@ from app.models.phrase_organic import PhraseOrganic
 from app.models.phrase_related import PhraseRelated
 from app.models.phrase_fullsearch import PhraseFullSearch
 from app.models.phrase_kdi import PhraseKdi
+from app.models.phrase_adwords import PhraseAdwords
