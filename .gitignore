@@ -5,3 +5,4 @@ docker-stack.yml
 .AppleDouble
 .LSOverride
 .vscode/*
+.idea
