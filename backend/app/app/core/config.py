@@ -82,6 +82,9 @@ class Settings(BaseSettings):
     FIRST_SUPERUSER_PASSWORD: str
     USERS_OPEN_REGISTRATION: bool = False
 
+    #SEMRUSH TOKEN
+    TOKEN_SEMRUSH: str = "646bf1328eee1f3076d405e43817b01e"
+
     class Config:
         case_sensitive = True
 

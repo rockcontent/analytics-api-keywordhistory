@@ -1,16 +1,17 @@
-from typing import Any, List
+from typing import Any, List, Optional
+from datetime import datetime
 
+from python_semrush.semrush import SemrushClient
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
+from app.core.config import settings
 
 from app import crud, models, schemas
 from app.api import deps
 
 router = APIRouter()
 
-
-# client = SemrushClient(key='your_semrush_api_key')
-# result = client.domain_ranks(domain='example.com')
+client = SemrushClient(key=settings.TOKEN_SEMRUSH)
 
 
 @router.get("/phrase_all/{keyword}",
@@ -19,19 +20,42 @@ router = APIRouter()
                         "competition, and the number of results in all regional databases.")
 async def phrase_all(
         keyword: str,
+        database: Optional[str] = None,
         current_user: models.User = Depends(deps.get_current_active_user),
-        db: Session = Depends(deps.get_db),
+        db: Session = Depends(deps.get_db)
 ) -> Any:
     """
     Get a specific user by id.
     """
-    phrase_all = crud.phrase_all.get_by_keyword(db, keyword=keyword)
+    phrase_all = crud.phrase_all.get_by_keyword(db, keyword=keyword, database=database)
 
     if phrase_all is None:
         raise HTTPException(
             status_code=400, detail="The keyword doesn't exist"
         )
-    return phrase_all
+
+    if len(phrase_all) > 0:
+        return phrase_all
+    else:
+        response = []
+        if database is not None:
+            keywords = client.phrase_all(keyword, database=database)
+        else:
+            keywords = client.phrase_all(keyword)
+
+        for p in keywords:
+            kw = {
+                'date': str(datetime.strptime(p.get('Date'),'%Y%m%d').date()),
+                'database': p.get('Database'),
+                'keyword': p.get('Keyword'),
+                'search_volume': int(p.get('Search Volume')),
+                'cpc': p.get('CPC'),
+                'competition': float(p.get('Competition'))
+            }
+            response.append(kw)
+
+        crud.phrase_all.create(db=db, obj_in=response)
+        return response
 
 
 @router.get("/phrase_organic/{keyword}/{database}",
