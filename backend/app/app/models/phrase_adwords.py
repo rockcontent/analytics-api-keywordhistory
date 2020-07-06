@@ -9,3 +9,4 @@ class PhraseAdwords(Base):
     url = Column(String, index=True, nullable=False)
     visible_url = Column(String, index=True, nullable=False)
     keyword = Column(String, index=True, nullable=False)
+    database = Column(String, index=True, nullable=False)
