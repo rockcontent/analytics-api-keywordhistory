@@ -1,11 +1,11 @@
-from sqlalchemy import Column, Integer, String, Date, DECIMAL
+from sqlalchemy import Column, Integer, String, Date, DECIMAL, BigInteger
 
 from app.db.base_class import Base
 
 
 class PhraseRelated(Base):
     id = Column(Integer, primary_key=True, index=True)
-    number_results = Column(Integer, nullable=False, default=0)
+    number_results = Column(BigInteger, nullable=False, default=0)
     cpc = Column(DECIMAL, nullable=False, default=0.0)
     competition = Column(Integer, nullable=False, default=0)
     search_volume = Column(Integer, nullable=False, default=0)

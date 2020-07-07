@@ -205,7 +205,6 @@ async def phrase_adwords(
         for k in keywords:
             kw = {
                 'domain': k.get('Domain'),
-                'url': k.get('url'),
                 'visible_url': k.get('Visible Url'),
                 'keyword': keyword,
                 'database': database
@@ -238,8 +237,8 @@ async def phrase_adwords_historical(
                 'domain': k.get('Domain'),
                 'date': str(datetime.strptime(k.get('Date'), '%Y%m%d').date()),
                 'position': int(k.get('Position')),
-                'url': k.get('url'),
-                'title': k.get('title'),
+                'url': k.get('Url'),
+                'title': k.get('Title'),
                 'description': k.get('Description'),
                 'visible_url': k.get('Visible Url'),
                 'keyword': keyword
