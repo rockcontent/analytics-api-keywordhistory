@@ -5,7 +5,7 @@ from pydantic import BaseModel
 # Shared properties
 class PhraseKdi(BaseModel):
     keyword: str
-    keyword_dificult_index: float
+    keyword_difficulty_index: float
 
     class Config:
         orm_mode = True

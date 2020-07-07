@@ -1,9 +1,10 @@
 from typing import List, Optional
+from sqlalchemy import and_
 from fastapi.encoders import jsonable_encoder
 
 from sqlalchemy.orm import Session
 
-from sqlalchemy import and_
+
 
 from app.crud.base import CRUDBase
 from app.models.phrase_all import PhraseAll
@@ -12,17 +13,12 @@ from app.schemas.phrase_all import PhraseAllCreate, PhraseAllUpdate
 
 class CRUDPhraseAll(CRUDBase[PhraseAll, PhraseAllCreate, PhraseAllUpdate]):
     def get_by_keyword(self, db: Session, *, keyword: str, database: Optional[str] = None) -> List[PhraseAll]:
-        if database is not None:
-            return (
-                db.query(PhraseAll)
-                .filter(and_(PhraseAll.keyword == keyword, PhraseAll.database == database))
-                .all()
-            )
         return (
             db.query(PhraseAll)
-            .filter(PhraseAll.keyword == keyword)
+            .filter(and_(PhraseAll.keyword == keyword, PhraseAll.database == database))
             .all()
         )
+
     def create(
         self, db: Session, *, obj_in: List[PhraseAllCreate],
     ) -> List[PhraseAll]:

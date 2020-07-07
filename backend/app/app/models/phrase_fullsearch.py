@@ -12,3 +12,4 @@ class PhraseFullSearch(Base):
     search_volume = Column(Integer, nullable=False, default=0)
     trends = Column(String, index=True, nullable=True)
     database = Column(String, index=True, nullable=False)
+    keyword_search = Column(String, index=True, nullable=False)

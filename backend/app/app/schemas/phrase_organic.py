@@ -6,7 +6,7 @@ from pydantic import BaseModel
 # Shared properties
 class PhraseOrganic(BaseModel):
     domain: str
-    ulr: str
+    url: str
     keyword: str
 
     class Config:

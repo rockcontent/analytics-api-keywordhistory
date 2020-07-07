@@ -1,5 +1,6 @@
 from typing import List
 from sqlalchemy import and_
+from fastapi.encoders import jsonable_encoder
 
 from sqlalchemy.orm import Session
 
@@ -15,6 +16,17 @@ class CRUDPhraseAdwords(CRUDBase[PhraseAdwords, PhraseAdwordsCreate, PhraseAdwor
             .filter(and_(PhraseAdwords.keyword == keyword, PhraseAdwords.database == database))
             .all()
         )
+
+    def create(
+        self, db: Session, *, obj_in: List[PhraseAdwordsCreate],
+    ) -> List[PhraseAdwords]:
+        for p in obj_in:
+            obj_in_data = jsonable_encoder(p)
+            db_obj = self.model(**obj_in_data)
+            db.add(db_obj)
+            db.commit()
+            db.refresh(db_obj)
+        return obj_in
 
 
 phrase_adwords = CRUDPhraseAdwords(PhraseAdwords)

@@ -13,3 +13,4 @@ class PhraseRelated(Base):
     database = Column(String, index=True)
     trends = Column(String, index=True, nullable=True)
     related_relevance = Column(DECIMAL, index=False, default=0.0)
+    keyword_search = Column(String, index=True, nullable=False)
