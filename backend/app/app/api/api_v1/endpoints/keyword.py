@@ -47,7 +47,7 @@ async def phrase_all(
             kw = {
                 'date': str(datetime.strptime(p.get('Date'),'%Y%m%d').date()),
                 'database': p.get('Database'),
-                'keyword': p.get('Keyword'),
+                'keyword': p.get('Keyword').encode('utf8'),
                 'search_volume': int(p.get('Search Volume')),
                 'cpc': p.get('CPC'),
                 'competition': float(p.get('Competition'))
