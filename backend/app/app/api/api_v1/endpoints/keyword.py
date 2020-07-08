@@ -31,7 +31,7 @@ async def phrase_all(
         return phrase_all_data
     else:
         response = []
-        keywords = client.phrase_all(keyword, database=database)
+        keywords = await client.phrase_all(keyword, database=database)
 
         for k in keywords:
             kw = {
@@ -66,7 +66,7 @@ async def phrase_organic(
     else:
         response = []
 
-        keywords = client.phrase_organic(keyword, database)
+        keywords = await client.phrase_organic(keyword, database)
 
         for k in keywords:
             kw = {
@@ -97,7 +97,7 @@ async def phrase_this(
         return phrase_this_data
     else:
         response = []
-        keywords = client.phrase_this(keyword, database)
+        keywords = await client.phrase_this(keyword, database)
         for k in keywords:
             kw = {
                 'keyword': k.get('Keyword'),
@@ -130,7 +130,7 @@ async def phrase_related(
         return phrase_related_data
     else:
         response = []
-        keywords = client.phrase_related(keyword, database)
+        keywords = await client.phrase_related(keyword, database)
 
         for k in keywords:
             kw = {
@@ -165,7 +165,7 @@ async def phrase_fullsearch(
         return phrase_fullsearch_data
     else:
         response = []
-        keywords = client.phrase_fullsearch(keyword, database)
+        keywords = await client.phrase_fullsearch(keyword, database)
 
         for k in keywords:
             kw = {
@@ -200,7 +200,7 @@ async def phrase_adwords(
         return phrase_adwords_data
     else:
         response = []
-        keywords = client.phrase_adwords(keyword, database)
+        keywords = await client.phrase_adwords(keyword, database)
 
         for k in keywords:
             kw = {
@@ -230,7 +230,7 @@ async def phrase_adwords_historical(
         return phrase_adwords_historical_data
     else:
         response = []
-        keywords = client.phrase_adwords_historical(keyword, database)
+        keywords = await client.phrase_adwords_historical(keyword, database)
 
         for k in keywords:
             kw = {
@@ -265,7 +265,7 @@ async def phrase_kdi(
         return phrase_kdi_data
     else:
         response = []
-        keywords = client.phrase_kdi(keyword, database)
+        keywords = await client.phrase_kdi(keyword, database)
 
         for k in keywords:
             kw = {
