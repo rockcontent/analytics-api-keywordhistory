@@ -1,4 +1,4 @@
-from .crud_item import item
+#from .crud_item import item
 from .crud_user import user
 from .crud_phrase_all import phrase_all
 from .crud_phrase_organic import phrase_organic
