@@ -13,7 +13,7 @@ from app.utils import send_new_account_email
 router = APIRouter()
 
 
-@router.get("/", response_model=List[schemas.User])
+@router.get("/", response_model=List[schemas.User], include_in_schema=False)
 def read_users(
     db: Session = Depends(deps.get_db),
     skip: int = 0,
@@ -27,7 +27,7 @@ def read_users(
     return users
 
 
-@router.post("/", response_model=schemas.User)
+@router.post("/", response_model=schemas.User, include_in_schema=False)
 def create_user(
     *,
     db: Session = Depends(deps.get_db),
@@ -51,7 +51,7 @@ def create_user(
     return user
 
 
-@router.put("/me", response_model=schemas.User)
+@router.put("/me", response_model=schemas.User, include_in_schema=False)
 def update_user_me(
     *,
     db: Session = Depends(deps.get_db),
@@ -75,7 +75,7 @@ def update_user_me(
     return user
 
 
-@router.get("/me", response_model=schemas.User)
+@router.get("/me", response_model=schemas.User, include_in_schema=False)
 def read_user_me(
     db: Session = Depends(deps.get_db),
     current_user: models.User = Depends(deps.get_current_active_user),
@@ -86,7 +86,7 @@ def read_user_me(
     return current_user
 
 
-@router.post("/open", response_model=schemas.User)
+@router.post("/open", response_model=schemas.User, include_in_schema=False)
 def create_user_open(
     *,
     db: Session = Depends(deps.get_db),
@@ -113,7 +113,7 @@ def create_user_open(
     return user
 
 
-@router.get("/{user_id}", response_model=schemas.User)
+@router.get("/{user_id}", response_model=schemas.User, include_in_schema=False)
 def read_user_by_id(
     user_id: int,
     current_user: models.User = Depends(deps.get_current_active_user),
@@ -132,7 +132,7 @@ def read_user_by_id(
     return user
 
 
-@router.put("/{user_id}", response_model=schemas.User)
+@router.put("/{user_id}", response_model=schemas.User, include_in_schema=False)
 def update_user(
     *,
     db: Session = Depends(deps.get_db),
