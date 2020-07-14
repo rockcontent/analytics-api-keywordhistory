@@ -4,22 +4,22 @@ from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
 
 from app.crud.base import CRUDBase
-from app.models.domain_domains import DomainDomains
-from app.schemas.domain_domains import DomainDomainsCreate, DomainDomainsUpdate
+from app.models.domain_organic import DomainOrganic
+from app.schemas.domain_organic import DomainOrganicCreate, DomainOrganicUpdate
 
 
-class CRUDDomainDomains(CRUDBase[DomainDomains, DomainDomainsCreate, DomainDomainsUpdate]):
+class CRUDDomainOrganic(CRUDBase[DomainOrganic, DomainOrganicCreate, DomainOrganicUpdate]):
 
-    def get_by_domains(self, db: Session, *, domains: str, database: Optional[str] = None) -> List[DomainDomains]:
+    def get_by_domain(self, db: Session, *, domain: str, database: Optional[str] = None) -> List[DomainOrganic]:
         return (
-            db.query(DomainDomains)
-            .filter(and_(DomainDomains.domains_query == domains, DomainDomains.database == database))
+            db.query(DomainOrganic)
+            .filter(and_(DomainOrganic.domain == domain, DomainOrganic.database == database))
             .all()
         )
 
     def create(
-        self, db: Session, *, obj_in: List[DomainDomainsCreate],
-    ) -> List[DomainDomains]:
+        self, db: Session, *, obj_in: List[DomainOrganicCreate],
+    ) -> List[DomainOrganic]:
         for p in obj_in:
             obj_in_data = jsonable_encoder(p)
             db_obj = self.model(**obj_in_data)
@@ -29,7 +29,7 @@ class CRUDDomainDomains(CRUDBase[DomainDomains, DomainDomainsCreate, DomainDomai
         return obj_in
 
 
-domain_domains = CRUDDomainDomains(DomainDomains)
+domain_organic = CRUDDomainOrganic(DomainOrganic)
 
 
 

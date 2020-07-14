@@ -12,3 +12,4 @@ from app.models.phrase_adwords import PhraseAdwords
 from app.models.phrase_adwords_historical import PhraseAdwordsHistorical
 from app.models.phrase_this import PhraseThis
 from app.models.domain_domains import DomainDomains
+from app.models.domain_organic import DomainOrganic

@@ -11,3 +11,4 @@ from .phrase_adwords_historical import PhraseAdwordsHistorical
 from .phrase_related import PhraseRelated
 from .phrase_fullsearch import PhraseFullsearch
 from .domain_domains import DomainDomains
+from .domain_organic import DomainOrganic

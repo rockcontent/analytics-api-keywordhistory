@@ -13,7 +13,7 @@ class CRUDDomainDomains(CRUDBase[DomainDomains, DomainDomainsCreate, DomainDomai
     def get_by_domains(self, db: Session, *, domains: str, database: Optional[str] = None) -> List[DomainDomains]:
         return (
             db.query(DomainDomains)
-            .filter(and_(DomainDomains.domain_query == domains, DomainDomains.database == database))
+            .filter(and_(DomainDomains.domains_query == domains, DomainDomains.database == database))
             .all()
         )
 

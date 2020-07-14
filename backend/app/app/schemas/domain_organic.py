@@ -2,21 +2,28 @@ from pydantic import BaseModel
 
 
 # Shared properties
-class DomainDomains(BaseModel):
-    domain: str
+class DomainOrganic(BaseModel):
     keyword: str
     search_volume: int
-    cpc: str
+    cpc: float
     competition: int
+    position: int
+    previous_position: int
+    position_difference: int
+    url: str
+    traffic: int
+    traffic_cost: int
+    number_results: int
+    trends: int
 
     class Config:
         orm_mode = True
 
 
-class DomainDomainsCreate(DomainDomains):
+class DomainOrganicCreate(DomainOrganic):
     pass
 
 
-class DomainDomainsUpdate(DomainDomains):
+class DomainOrganicUpdate(DomainOrganic):
     pass
 
