@@ -10,6 +10,7 @@ from .crud_phrase_adwords_historical import phrase_adwords_historical
 from .crud_phrase_kdi import phrase_kdi
 from .crud_domain_domains import domain_domains
 from .crud_domain_organic import domain_organic
+from .crud_backlinks_overview import backlinks_overview
 
 # For a new basic set of CRUD operations you could just do
 

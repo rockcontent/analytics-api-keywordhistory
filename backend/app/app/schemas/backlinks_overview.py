@@ -2,28 +2,29 @@ from pydantic import BaseModel
 
 
 # Shared properties
-class DomainOrganic(BaseModel):
-    keyword: str
-    search_volume: int
-    cpc: float
-    competition: int
-    position: int
-    previous_position: int
-    position_difference: int
-    url: str
-    traffic: int
-    traffic_cost: int
-    number_results: int
-    trends: int
+class BacklinksOverview(BaseModel):
+    total: int
+    domains_num: int
+    ips_num: int
+    follows_num: int
+    nofollows_num: int
+    score: int
+    trust_score: int
+    urls_num: int
+    ipclassc_num: int
+    texts_num: int
+    forms_num: int
+    frames_num: int
+    images_num: int
 
     class Config:
         orm_mode = True
 
 
-class DomainOrganicCreate(DomainOrganic):
+class BacklinksOverviewCreate(BacklinksOverview):
     pass
 
 
-class DomainOrganicUpdate(DomainOrganic):
+class BacklinksOverviewUpdate(BacklinksOverview):
     pass
 
