@@ -13,14 +13,13 @@ router = APIRouter()
 client = SemrushClient(key=settings.TOKEN_SEMRUSH)
 
 
-@router.get("/domain_domains/{domains}/{database}",
-            response_model=List[schemas.domain_domains.DomainDomains],
-            description="This report allows users to compare up to five domains by common keywords, "
-                        "unique keywords, all keywords, or search terms that are unique to the "
-                        "first domain.")
+@router.get("/backlinks_overview/{domain}/{target}",
+            response_model=List[schemas.backlinks_overview.BacklinksOverview],
+            description="This report provides a summary of backlinks, including their type, referring "
+                        "domains and IP addresses for a domain, root domain, or URL.")
 async def domain_domains(
-        domains: str,
-        database: str,
+        domain: str,
+        target: str,
         current_user: models.User = Depends(deps.get_current_active_user),
         db: Session = Depends(deps.get_db)
 ) -> Any:
@@ -49,9 +48,10 @@ async def domain_domains(
 
 
 @router.get("/domain_organic/{domain}/{database}",
-            response_model=List[schemas.domain_organic.DomainOrganic],
-            description="This report lists keywords that bring "
-                        "users to a domain via Google top 100 organic search results.")
+            response_model=List[schemas.domain_domains.DomainDomains],
+            description="This report allows users to compare up to five domains by common keywords, "
+                        "unique keywords, all keywords, or search terms that are unique to the "
+                        "first domain.")
 async def domain_organic(
         domain: str,
         database: str,

@@ -1,5 +1,6 @@
 from typing import Any
-
+from sqlalchemy import Column, Date
+from sqlalchemy.sql import func
 from sqlalchemy.ext.declarative import as_declarative, declared_attr
 
 
@@ -11,3 +12,4 @@ class Base:
     @declared_attr
     def __tablename__(cls) -> str:
         return cls.__name__.lower()
+    created_at = Column(Date, default=func.now())

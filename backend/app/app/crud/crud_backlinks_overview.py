@@ -1,6 +1,8 @@
-from typing import List
+from typing import List, Optional
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
+from sqlalchemy import and_
+from datetime import datetime, timedelta
 
 from app.crud.base import CRUDBase
 from app.models.backlinks_overview import BacklinksOverview
@@ -9,11 +11,18 @@ from app.schemas.backlinks_overview import BacklinksOverviewCreate, BacklinksOve
 
 class CRUDBacklinksOverview(CRUDBase[BacklinksOverview, BacklinksOverviewCreate, BacklinksOverviewUpdate]):
 
-    def get_by_domain(self, db: Session, *, domain: str) -> List[BacklinksOverview]:
+    def get_by_domain(self, db: Session, *, domain: str, target: Optional[str] = None) -> List[BacklinksOverview]:
+        since = datetime.now() - timedelta(days=30)
+        if target is None:
+            return (
+                db.query(BacklinksOverview)
+                .filter(and_(BacklinksOverview.domain == domain, BacklinksOverview.created_at >= since))
+                .all()
+            )
         return (
             db.query(BacklinksOverview)
-            .filter(BacklinksOverview.domain == domain)
-            .all()
+                .filter(and_(BacklinksOverview.domain == domain, BacklinksOverview.target==target, BacklinksOverview.created_at >= since))
+                .all()
         )
 
     def create(

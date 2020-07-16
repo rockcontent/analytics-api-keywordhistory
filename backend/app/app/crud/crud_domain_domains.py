@@ -2,6 +2,7 @@ from typing import List, Optional
 from sqlalchemy import and_
 from fastapi.encoders import jsonable_encoder
 from sqlalchemy.orm import Session
+from datetime import datetime, timedelta
 
 from app.crud.base import CRUDBase
 from app.models.domain_domains import DomainDomains
@@ -10,10 +11,12 @@ from app.schemas.domain_domains import DomainDomainsCreate, DomainDomainsUpdate
 
 class CRUDDomainDomains(CRUDBase[DomainDomains, DomainDomainsCreate, DomainDomainsUpdate]):
 
+
     def get_by_domains(self, db: Session, *, domains: str, database: Optional[str] = None) -> List[DomainDomains]:
+        since = datetime.now() - timedelta(days=30)
         return (
             db.query(DomainDomains)
-            .filter(and_(DomainDomains.domains_query == domains, DomainDomains.database == database))
+            .filter(and_(DomainDomains.domains_query == domains, DomainDomains.database == database, DomainDomains.created_at >= since))
             .all()
         )
 

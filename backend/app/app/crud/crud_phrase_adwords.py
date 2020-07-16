@@ -1,6 +1,7 @@
 from typing import List
 from sqlalchemy import and_
 from fastapi.encoders import jsonable_encoder
+from datetime import datetime, timedelta
 
 from sqlalchemy.orm import Session
 
@@ -11,9 +12,13 @@ from app.schemas.phrase_adwords import PhraseAdwordsCreate, PhraseAdwordsUpdate
 
 class CRUDPhraseAdwords(CRUDBase[PhraseAdwords, PhraseAdwordsCreate, PhraseAdwordsUpdate]):
     def get_by_keyword(self, db: Session, *, keyword: str, database: str) -> List[PhraseAdwords]:
+        since = datetime.now() - timedelta(days=30)
         return (
             db.query(PhraseAdwords)
-            .filter(and_(PhraseAdwords.keyword == keyword, PhraseAdwords.database == database))
+            .filter(and_(PhraseAdwords.keyword == keyword,
+                         PhraseAdwords.database == database,
+                         PhraseAdwords.created_at >= since)
+                    )
             .all()
         )
 

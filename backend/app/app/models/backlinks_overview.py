@@ -19,4 +19,5 @@ class BacklinksOverview(Base):
     forms_num = Column(Integer, nullable=False, default=0)
     frames_num = Column(Integer, nullable=False, default=0)
     images_num = Column(Integer, nullable=False, default=0)
+    target = Column(String, nullable=False, index=True)
 

@@ -1,6 +1,7 @@
 from typing import List
 from sqlalchemy import and_
 from fastapi.encoders import jsonable_encoder
+from datetime import datetime, timedelta
 
 from sqlalchemy.orm import Session
 
@@ -11,9 +12,13 @@ from app.schemas.phrase_fullsearch import PhraseFullsearchCreate, PhraseFullsear
 
 class CRUDPhraseFullsearch(CRUDBase[PhraseFullSearch, PhraseFullsearchCreate, PhraseFullsearchUpdate]):
     def get_by_keyword(self, db: Session, *, keyword: str, database: str) -> List[PhraseFullSearch]:
+        since = datetime.now() - timedelta(days=30)
         return (
             db.query(PhraseFullSearch)
-            .filter(and_(PhraseFullSearch.keyword == keyword, PhraseFullSearch.database == database))
+            .filter(and_(PhraseFullSearch.keyword == keyword,
+                         PhraseFullSearch.database == database,
+                         PhraseFullSearch.created_at >= since)
+                    )
             .all()
         )
 
