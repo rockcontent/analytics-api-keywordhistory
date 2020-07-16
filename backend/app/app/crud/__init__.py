@@ -11,6 +11,7 @@ from .crud_phrase_kdi import phrase_kdi
 from .crud_domain_domains import domain_domains
 from .crud_domain_organic import domain_organic
 from .crud_backlinks_overview import backlinks_overview
+from .crud_url_organic import url_organic
 
 # For a new basic set of CRUD operations you could just do
 

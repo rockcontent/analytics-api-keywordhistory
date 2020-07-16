@@ -13,3 +13,4 @@ from .phrase_fullsearch import PhraseFullsearch
 from .domain_domains import DomainDomains
 from .domain_organic import DomainOrganic
 from .backlinks_overview import BacklinksOverview
+from .url_organic import UrlOrganic
