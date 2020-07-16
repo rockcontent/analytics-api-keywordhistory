@@ -14,3 +14,4 @@ from app.models.phrase_this import PhraseThis
 from app.models.domain_domains import DomainDomains
 from app.models.domain_organic import DomainOrganic
 from app.models.backlinks_overview import BacklinksOverview
+from app.models.url_organic import UrlOrganic

@@ -6,7 +6,7 @@ from app.db.base_class import Base
 class UrlOrganic(Base):
     id = Column(Integer, primary_key=True, index=True)
     database = Column(String, index=True)
-    domain = Column(String, index=True, nullable=False)
+    keyword = Column(String, index=True)
     search_volume = Column(Integer, nullable=False, default=0)
     cpc = Column(DECIMAL, nullable=False, default=0.0)
     competition = Column(Integer, nullable=False, default=0)
@@ -16,3 +16,4 @@ class UrlOrganic(Base):
     traffic_cost = Column(DECIMAL, nullable=False, default=0.0)
     number_results = Column(BigInteger, nullable=False, default=0)
     trends = Column(String, index=True, nullable=False)
+    serp_features = Column(String, nullable=False, default=0)

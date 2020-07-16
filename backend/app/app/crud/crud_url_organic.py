@@ -10,11 +10,11 @@ from datetime import datetime, timedelta
 
 class CRUDUrlOrganic(CRUDBase[UrlOrganic, UrlOrganicCreate, UrlOrganicUpdate]):
 
-    def get_by_domain(self, db: Session, *, domain: str, database: Optional[str] = None) -> List[UrlOrganic]:
+    def get_by_domain(self, db: Session, *, url: str, database: str) -> List[UrlOrganic]:
         since = datetime.now() - timedelta(days=30)
         return (
             db.query(UrlOrganic)
-            .filter(and_(UrlOrganic.domain == domain,
+            .filter(and_(UrlOrganic.url == url,
                          UrlOrganic.database == database,
                          UrlOrganic.created_at >= since)
                     )

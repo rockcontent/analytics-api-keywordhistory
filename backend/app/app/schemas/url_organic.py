@@ -12,7 +12,8 @@ class UrlOrganic(BaseModel):
     traffic: int
     traffic_cost: int
     number_results: int
-    trends: int
+    trends: str
+    serp_features: str
 
     class Config:
         orm_mode = True
