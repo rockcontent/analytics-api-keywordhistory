@@ -17,74 +17,40 @@ client = SemrushClient(key=settings.TOKEN_SEMRUSH)
             response_model=List[schemas.backlinks_overview.BacklinksOverview],
             description="This report provides a summary of backlinks, including their type, referring "
                         "domains and IP addresses for a domain, root domain, or URL.")
-async def domain_domains(
+async def backlinks_overview(
         domain: str,
         target: str,
         current_user: models.User = Depends(deps.get_current_active_user),
         db: Session = Depends(deps.get_db)
 ) -> Any:
 
-    domain_domains_data = crud.domain_domains.get_by_domains(db, domains=domains, database=database)
+    backlinks_ovreview_data = crud.backlinks_overview.get_by_domain(db, domain=domain, target=target)
 
-    if len(domain_domains_data) > 0:
-        return domain_domains_data
+    if len(backlinks_ovreview_data) > 0:
+        return backlinks_ovreview_data
     else:
         response = []
-        domains = await client.domain_domains(domains, database=database)
+        backlinks = await client.backlinks_overview(domain, target)
 
-        for d in domains:
-            dm = {
-                'database': database,
-                'keyword': d.get('Keyword').encode('utf8'),
-                'search_volume': int(d.get('Search Volume')),
-                'cpc': d.get('CPC'),
-                'competition': float(d.get('Competition')),
-                'domains_query': domains
+        for b in backlinks:
+            bk = {'domain': domain,
+                  'target': target,
+                  'total': int(b.get('total')),
+                  'domains_num': int(b.get('domains_num')),
+                  'ips_num': int(b.get('ips_num')),
+                  'follows_num': int(b.get('follows_num')),
+                  'nofollows_num': int(b.get('nofollows_num')),
+                  'score': int(b.get('score')),
+                  'trust_score': int(b.get('trust_score')),
+                  'urls_num': int(b.get('urls_num')),
+                  'ipclassc_num': int(b.get('ipclassc_num')),
+                  'texts_num': int(b.get('texts_num')),
+                  'forms_num': int(b.get('forms_num')),
+                  'frames_num': int(b.get('frames_num')),
+                  'images_num': int(b.get('images_num'))
             }
-            response.append(dm)
 
-        crud.domain_domains.create(db=db, obj_in=response)
-        return response
+            response.append(bk)
 
-
-@router.get("/domain_organic/{domain}/{database}",
-            response_model=List[schemas.domain_domains.DomainDomains],
-            description="This report allows users to compare up to five domains by common keywords, "
-                        "unique keywords, all keywords, or search terms that are unique to the "
-                        "first domain.")
-async def domain_organic(
-        domain: str,
-        database: str,
-        current_user: models.User = Depends(deps.get_current_active_user),
-        db: Session = Depends(deps.get_db)
-) -> Any:
-
-    domain_organic_data = crud.domain_organic.get_by_domain(db, domain=domain, database=database)
-
-    if len(domain_organic_data) > 0:
-        return domain_organic_data
-    else:
-        response = []
-        domains = await client.domain_organic(domain, database=database)
-
-        for d in domains:
-            dm = {
-                'domain': domain,
-                'database': database,
-                'keyword': d.get('Keyword').encode('utf8'),
-                'position': int(d.get('Position')),
-                'previous_position': int(d.get('Previous Position')),
-                'position_difference': int(d.get('Position Difference')),
-                'search_volume': int(d.get('Search Volume')),
-                'cpc': d.get('CPC'),
-                'competition': float(d.get('Competition')),
-                'url': d.get('Url'),
-                'traffic': float(d.get('Traffic (%)')),
-                'traffic_cost': float(d.get('Traffic Cost (%)')),
-                'number_results': int(d.get('Number of Results')),
-                'trends': d.get('Trends')
-            }
-            response.append(dm)
-
-        crud.domain_organic.create(db=db, obj_in=response)
+        crud.backlinks_overview.create(db=db, obj_in=response)
         return response
