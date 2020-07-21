@@ -13,7 +13,7 @@ router = APIRouter()
 client = SemrushClient(key=settings.TOKEN_SEMRUSH)
 
 
-@router.get("/domain_domains/{domains}/{database}",
+@router.get("/domain_domains/",
             response_model=List[schemas.domain_domains.DomainDomains],
             description="This report allows users to compare up to five domains by common keywords, "
                         "unique keywords, all keywords, or search terms that are unique to the "
@@ -48,7 +48,7 @@ async def domain_domains(
         return response
 
 
-@router.get("/domain_organic/{domain}/{database}",
+@router.get("/domain_organic/",
             response_model=List[schemas.domain_organic.DomainOrganic],
             description="This report lists keywords that bring "
                         "users to a domain via Google top 100 organic search results.")
