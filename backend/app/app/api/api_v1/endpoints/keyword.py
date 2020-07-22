@@ -21,17 +21,14 @@ client = SemrushClient(key=settings.TOKEN_SEMRUSH)
 async def phrase_all(
         keyword: str,
         database: str,
+        display_limit: int = None,
         current_user: models.User = Depends(deps.get_current_active_user),
         db: Session = Depends(deps.get_db)
 ) -> Any:
 
-    phrase_all_data = crud.phrase_all.get_by_keyword(db, keyword=keyword, database=database)
-
-    if len(phrase_all_data) > 0:
-        return phrase_all_data
-    else:
+    async def update_from_serp_api(db, keyword, database, **kwargs):
         response = []
-        keywords = await client.phrase_all(keyword, database=database)
+        keywords = await client.phrase_all(keyword, database=database, **kwargs)
 
         for k in keywords:
             kw = {
@@ -44,9 +41,23 @@ async def phrase_all(
             }
             response.append(kw)
 
+        crud.phrase_all.delete_by_keyword(db, keyword=keyword, database=database)
         crud.phrase_all.create(db=db, obj_in=response)
         return response
 
+
+    phrase_all_data = crud.phrase_all.get_by_keyword(db, keyword=keyword, database=database)
+    if display_limit:
+        if len(phrase_all_data) >= display_limit:
+            return phrase_all_data[:display_limit]
+        else:
+            return await update_from_serp_api(db, keyword, database, display_limit=display_limit)
+    else:
+        if len(phrase_all_data) > 0:
+            return phrase_all_data
+        else:
+            return await update_from_serp_api(db, keyword, database)
+    
 
 @router.get("/phrase_organic/{keyword}/{database}",
             response_model=List[schemas.phrase_organic.PhraseOrganic],
@@ -55,19 +66,15 @@ async def phrase_all(
 async def phrase_organic(
         keyword: str,
         database: str,
+        display_limit: int = None,
         current_user: models.User = Depends(deps.get_current_active_user),
         db: Session = Depends(deps.get_db),
 ) -> Any:
 
-    phrase_organic_data = crud.phrase_organic.get_by_keyword(db, keyword=keyword, database=database)
-
-    if len(phrase_organic_data) > 0:
-        return phrase_organic_data
-    else:
+    async def update_from_serp_api(db, keyword, database, **kwargs):
         response = []
 
-        keywords = await client.phrase_organic(keyword, database)
-
+        keywords = await client.phrase_organic(keyword, database, **kwargs)
         for k in keywords:
             kw = {
                 'keyword': keyword,
@@ -77,8 +84,22 @@ async def phrase_organic(
             }
             response.append(kw)
 
+        crud.phrase_organic.delete_by_keyword(db, keyword=keyword, database=database)
         crud.phrase_organic.create(db, obj_in=response)
         return response
+
+    phrase_organic_data = crud.phrase_organic.get_by_keyword(db, keyword=keyword, database=database)
+
+    if display_limit:
+        if len(phrase_organic_data) >= display_limit:
+            return phrase_organic_data[:display_limit]
+        else:
+            return await update_from_serp_api(db, keyword, database, display_limit=display_limit)
+    else:
+        if len(phrase_organic_data) > 0:
+            return phrase_organic_data
+        else:
+            return await update_from_serp_api(db, keyword, database)
 
 @router.get("/phrase_this/{keyword}/{database}",
             response_model=List[schemas.phrase_this.PhraseThis],
@@ -120,17 +141,14 @@ async def phrase_this(
 async def phrase_related(
         keyword: str,
         database: str,
+        display_limit: int = None,
         current_user: models.User = Depends(deps.get_current_active_user),
         db: Session = Depends(deps.get_db),
 ) -> Any:
 
-    phrase_related_data = crud.phrase_related.get_by_keyword(db, keyword=keyword, database=database)
-
-    if len(phrase_related_data) > 0:
-        return phrase_related_data
-    else:
+    async def update_from_serp_api(db, keyword, database, **kwargs):
         response = []
-        keywords = await client.phrase_related(keyword, database)
+        keywords = await client.phrase_related(keyword, database, **kwargs)
 
         for k in keywords:
             kw = {
@@ -145,7 +163,23 @@ async def phrase_related(
                 'keyword_search': keyword
             }
             response.append(kw)
-        return crud.phrase_related.create(db, obj_in=response)
+
+        crud.phrase_related.delete_by_keyword(db, keyword=keyword, database=database)
+        crud.phrase_related.create(db, obj_in=response)
+        return response
+
+    phrase_related_data = crud.phrase_related.get_by_keyword(db, keyword=keyword, database=database)
+
+    if display_limit:
+        if len(phrase_related_data) >= display_limit:
+            return phrase_related_data[:display_limit]
+        else:
+            return await update_from_serp_api(db, keyword, database, display_limit=display_limit)
+    else:
+        if len(phrase_related_data) > 0:
+            return phrase_related_data
+        else:
+            return await update_from_serp_api(db, keyword, database)
 
 
 @router.get("/phrase_fullsearch/{keyword}/{database}",
