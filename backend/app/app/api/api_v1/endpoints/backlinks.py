@@ -13,7 +13,7 @@ router = APIRouter()
 client = SemrushClient(key=settings.TOKEN_SEMRUSH)
 
 
-@router.get("/backlinks_overview/{domain}/{target}",
+@router.get("/backlinks_overview/",
             response_model=List[schemas.backlinks_overview.BacklinksOverview],
             description="This report provides a summary of backlinks, including their type, referring "
                         "domains and IP addresses for a domain, root domain, or URL.")

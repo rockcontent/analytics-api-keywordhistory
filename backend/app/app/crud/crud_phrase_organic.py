@@ -23,17 +23,20 @@ class CRUDPhraseOrganic(CRUDBase[PhraseOrganic, PhraseOrganicCreate, PhraseOrgan
 
     def create(
         self, db: Session, *, obj_in: List[PhraseOrganicCreate],
-    ) -> List[PhraseOrganic]:
-        for p in obj_in:
-            obj_in_data = jsonable_encoder(p)
-            db_obj = self.model(**obj_in_data)
-            db.add(db_obj)
-            db.commit()
-            db.refresh(db_obj)
-        return obj_in
+        ) -> List[PhraseOrganic]:
+            for p in obj_in:
+                obj_in_data = jsonable_encoder(p)
+                db_obj = self.model(**obj_in_data)
+                db.add(db_obj)
+                db.commit()
+                db.refresh(db_obj)
+            return obj_in
 
+    def delete_by_keyword(self, db: Session, *, keyword: str, database: str) -> bool:
+        return (
+            db.query(PhraseOrganic)
+            .filter(and_(PhraseOrganic.keyword == keyword, PhraseOrganic.database == database))
+            .delete()
+        )
 
 phrase_organic = CRUDPhraseOrganic(PhraseOrganic)
-
-
-
