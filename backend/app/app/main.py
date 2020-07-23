@@ -1,20 +1,16 @@
-import copy
 from os import path
-import random
-import string
 import time
 import graypy
 import logging
-import json
+import traceback
 from urllib.request import Request
-from datetime import datetime
 
 from fastapi import FastAPI
 from starlette.middleware.cors import CORSMiddleware
+from starlette.responses import Response
 
 from app.api.api_v1.api import api_router
 from app.core.config import settings
-from app.core.utils import read_bytes
 
 app = FastAPI(
     title=settings.PROJECT_NAME, openapi_url=f"{settings.API_V1_STR}/openapi.json"
@@ -27,10 +23,7 @@ logger = logging.getLogger(__name__)
 
 @app.middleware("http")
 async def log_requests(request: Request, call_next):
-    idem = ''.join(random.choices(string.ascii_uppercase + string.digits, k=6))
-    #logger.info(f"rid={idem} start request path={request.url.path}")
     token = request.headers.get("authorization")
-    #logger.info(f"rid={idem} application token: {token}")
     start_time = time.time()
     response = await call_next(request)
 
@@ -40,26 +33,32 @@ async def log_requests(request: Request, call_next):
     data = {
         "path": request.url.path,
         "speed": formatted_process_time,
-        "token": token,
-        "date": datetime.now(),
-
+        "token": token
     }
 
-    #content = await read_bytes(response.body_iterator)
-    binary = b''
-    copy_response = copy.deepcopy(response)
-    async for data in copy_response.body_iterator:
-        binary += data
-    body = binary.decode()
-
-    logger.info(body)
-
-    # graylog = logging.getLogger("api_log")
-    # graylog.setLevel(logging.INFO)
-    # handler = graypy.GELFTCPHandler('10.0.0.105', 12201)
-    # graylog.addHandler(handler)
-    # graylog.info(json.dumps(str(request.headers.__dict__)))
+    graylog = logging.getLogger("api_log")
+    graylog.setLevel(logging.INFO)
+    handler = graypy.GELFTCPHandler(settings.GRAYLOG_SERVER, settings.GRAYLOG_PORT)
+    graylog.addHandler(handler)
+    adapter = logging.LoggerAdapter(logging.getLogger("api_log"), {"request": request.__dict__})
+    adapter.info(data)
     return response
+
+
+@app.middleware("http")
+async def catch_exceptions_middleware(request: Request, call_next):
+    try:
+        return await call_next(request)
+    except Exception as e:
+        # you probably want some kind of logging here
+        graylog = logging.getLogger("api_exception")
+        graylog.setLevel(logging.ERROR)
+        handler = graypy.GELFTCPHandler(settings.GRAYLOG_SERVER, settings.GRAYLOG_PORT)
+        graylog.addHandler(handler)
+        adapter = logging.LoggerAdapter(logging.getLogger("api_exception"), {"request": request.__dict__})
+        adapter.error(traceback.format_exc())
+        return Response("Internal server error", status_code=500)
+
 
 # Set all CORS enabled origins
 if settings.BACKEND_CORS_ORIGINS:

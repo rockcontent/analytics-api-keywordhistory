@@ -82,6 +82,10 @@ class Settings(BaseSettings):
     FIRST_SUPERUSER_PASSWORD: str
     USERS_OPEN_REGISTRATION: bool = False
 
+    #Graylog Server
+    GRAYLOG_SERVER: str = "10.0.0.150"
+    GRAYLOG_PORT: int = 12201
+
     #SEMRUSH TOKEN
     TOKEN_SEMRUSH: str = "646bf1328eee1f3076d405e43817b01e"
 
