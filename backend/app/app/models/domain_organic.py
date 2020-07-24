@@ -19,3 +19,6 @@ class DomainOrganic(Base):
     traffic_cost = Column(DECIMAL, nullable=False, default=0.0)
     number_results = Column(BigInteger, nullable=False, default=0)
     trends = Column(String, index=True, nullable=False)
+
+    def get_unit_value(self):
+        return 10

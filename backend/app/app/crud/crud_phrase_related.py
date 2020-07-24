@@ -21,16 +21,16 @@ class CRUDPhraseRelated(CRUDBase[PhraseRelated, PhraseRelatedCreate, PhraseRelat
             .all()
         )
 
-    def create(
-        self, db: Session, *, obj_in: List[PhraseRelatedCreate],
-    ) -> List[PhraseRelated]:
-        for p in obj_in:
-            obj_in_data = jsonable_encoder(p)
-            db_obj = self.model(**obj_in_data)
-            db.add(db_obj)
-            db.commit()
-            db.refresh(db_obj)
-        return obj_in
+    # def create(
+    #     self, db: Session, *, obj_in: List[PhraseRelatedCreate],
+    # ) -> List[PhraseRelated]:
+    #     for p in obj_in:
+    #         obj_in_data = jsonable_encoder(p)
+    #         db_obj = self.model(**obj_in_data)
+    #         db.add(db_obj)
+    #         db.commit()
+    #         db.refresh(db_obj)
+    #     return obj_in
 
     def delete_by_keyword(self, db: Session, *, keyword: str, database: str) -> bool:
         return (

@@ -11,3 +11,6 @@ class PhraseThis(Base):
     cpc = Column(DECIMAL, nullable=False, default=0.0)
     competition = Column(Integer, nullable=False, default=0)
     number_results = Column(BigInteger, nullable=False, default=0)
+
+    def get_unit_value(self):
+        return 10

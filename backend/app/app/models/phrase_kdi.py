@@ -8,3 +8,6 @@ class PhraseKdi(Base):
     keyword = Column(String, index=True, nullable=False)
     keyword_difficulty_index = Column(DECIMAL, default=0.0)
     database = Column(String, nullable=False)
+
+    def get_unit_value(self):
+        return 50

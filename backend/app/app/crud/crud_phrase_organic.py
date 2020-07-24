@@ -1,6 +1,5 @@
 from typing import List
 from sqlalchemy import and_
-from fastapi.encoders import jsonable_encoder
 from datetime import timedelta, datetime
 
 from sqlalchemy.orm import Session
@@ -21,16 +20,6 @@ class CRUDPhraseOrganic(CRUDBase[PhraseOrganic, PhraseOrganicCreate, PhraseOrgan
             .all()
         )
 
-    def create(
-        self, db: Session, *, obj_in: List[PhraseOrganicCreate],
-        ) -> List[PhraseOrganic]:
-            for p in obj_in:
-                obj_in_data = jsonable_encoder(p)
-                db_obj = self.model(**obj_in_data)
-                db.add(db_obj)
-                db.commit()
-                db.refresh(db_obj)
-            return obj_in
 
     def delete_by_keyword(self, db: Session, *, keyword: str, database: str) -> bool:
         return (
@@ -40,3 +29,6 @@ class CRUDPhraseOrganic(CRUDBase[PhraseOrganic, PhraseOrganicCreate, PhraseOrgan
         )
 
 phrase_organic = CRUDPhraseOrganic(PhraseOrganic)
+
+
+

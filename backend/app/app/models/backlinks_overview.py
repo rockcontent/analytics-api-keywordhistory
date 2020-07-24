@@ -21,3 +21,6 @@ class BacklinksOverview(Base):
     images_num = Column(Integer, nullable=False, default=0)
     target = Column(String, nullable=False, index=True)
 
+    def get_unit_value(self):
+        return 40
+

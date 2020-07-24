@@ -1,5 +1,5 @@
 from typing import Any, List
-
+import asyncio
 from python_semrush.semrush import SemrushClient
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
@@ -27,6 +27,9 @@ async def url_organic(
     url_organic_data = crud.url_organic.get_by_domain(db, url=url, database=database)
 
     if len(url_organic_data) > 0:
+        loop = asyncio.get_event_loop()
+        loop.create_task(
+            crud.url_organic.save_log(db, url_organic_data, settings.RESPONSE_SOURCE_ROCKKWH))
         return url_organic_data
     else:
         response = []

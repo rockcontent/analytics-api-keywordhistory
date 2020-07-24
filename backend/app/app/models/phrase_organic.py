@@ -9,3 +9,6 @@ class PhraseOrganic(Base):
     keyword = Column(String, index=True, nullable=False)
     domain = Column(String, index=True, nullable=False)
     url = Column(String, index=True, nullable=False)
+
+    def get_unit_value(self):
+        return 10

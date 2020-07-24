@@ -13,3 +13,6 @@ class PhraseFullSearch(Base):
     trends = Column(String, index=True, nullable=True)
     database = Column(String, index=True, nullable=False)
     keyword_search = Column(String, index=True, nullable=False)
+
+    def get_unit_value(self):
+        return 20
