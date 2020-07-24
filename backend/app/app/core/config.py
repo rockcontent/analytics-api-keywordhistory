@@ -89,6 +89,10 @@ class Settings(BaseSettings):
     #SEMRUSH TOKEN
     TOKEN_SEMRUSH: str = "646bf1328eee1f3076d405e43817b01e"
 
+    #RESPONSE_SOURCE
+    RESPONSE_SOURCE_SEMRUSH = "semrush"
+    RESPONSE_SOURCE_ROCKKWH = "rockkwh"
+
     class Config:
         case_sensitive = True
 

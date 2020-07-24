@@ -7,6 +7,7 @@ import asyncio
 import logging
 from app.db.base_class import Base
 from app.models.log import Log
+from app.core.config import settings
 
 
 logging.basicConfig(level=logging.INFO)
@@ -49,7 +50,7 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
             loop.create_task(self.save_log(db, obj_in))
         return obj_in
 
-    async def save_log(self, db: Session, obj_in: CreateSchemaType) -> ModelType:
+    async def save_log(self, db: Session, obj_in: CreateSchemaType, response_source: str = settings.RESPONSE_SOURCE_SEMRUSH) -> ModelType:
         obj_in_data = jsonable_encoder(obj_in[0])
         db_obj = self.model(**obj_in_data)
 
@@ -64,12 +65,17 @@ class CRUDBase(Generic[ModelType, CreateSchemaType, UpdateSchemaType]):
         else:
             search_data = obj_in_data.get("keyword")
 
+        if response_source == settings.RESPONSE_SOURCE_ROCKKWH:
+            unit_cost = 0
+        else:
+            unit_cost = db_obj.get_unit_value()
+
         log = Log(
             search_data=search_data,
             search_type=db_obj.__class__.__name__,
             num_rows=len(obj_in),
-            source_response="semrush",
-            unit_cost=db_obj.get_unit_value(),
+            source_response=response_source,
+            unit_cost=unit_cost
         )
         db.add(log)
         db.commit()

@@ -1,5 +1,5 @@
 from typing import Any, List
-
+import asyncio
 from python_semrush.semrush import SemrushClient
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
@@ -28,6 +28,8 @@ async def domain_domains(
     domain_domains_data = crud.domain_domains.get_by_domains(db, domains=domains, database=database)
 
     if len(domain_domains_data) > 0:
+        loop = asyncio.get_event_loop()
+        loop.create_task(crud.domain_domains.save_log(db, domain_domains_data, settings.RESPONSE_SOURCE_ROCKKWH))
         return domain_domains_data
     else:
         response = []
@@ -62,6 +64,8 @@ async def domain_organic(
     domain_organic_data = crud.domain_organic.get_by_domain(db, domain=domain, database=database)
 
     if len(domain_organic_data) > 0:
+        loop = asyncio.get_event_loop()
+        loop.create_task(crud.domain_organic.save_log(db, domain_organic_data, settings.RESPONSE_SOURCE_ROCKKWH))
         return domain_organic_data
     else:
         response = []

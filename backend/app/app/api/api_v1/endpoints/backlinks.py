@@ -1,5 +1,5 @@
 from typing import Any, List
-
+import asyncio
 from python_semrush.semrush import SemrushClient
 from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
@@ -27,6 +27,8 @@ async def backlinks_overview(
     backlinks_ovreview_data = crud.backlinks_overview.get_by_domain(db, domain=domain, target=target)
 
     if len(backlinks_ovreview_data) > 0:
+        loop = asyncio.get_event_loop()
+        loop.create_task(crud.backlinks_overview.save_log(db, backlinks_ovreview_data, settings.RESPONSE_SOURCE_ROCKKWH))
         return backlinks_ovreview_data
     else:
         response = []

@@ -1,6 +1,5 @@
 from typing import List
 from sqlalchemy import and_
-from fastapi.encoders import jsonable_encoder
 from datetime import timedelta, datetime
 
 from sqlalchemy.orm import Session

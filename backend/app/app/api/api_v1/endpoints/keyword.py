@@ -1,10 +1,11 @@
-from typing import Any, List, Optional
+from typing import Any, List
 from datetime import datetime
 
 from python_semrush.semrush import SemrushClient
-from fastapi import APIRouter, Depends, HTTPException
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.core.config import settings
+import asyncio
 
 from app import crud, models, schemas
 from app.api import deps
@@ -45,15 +46,19 @@ async def phrase_all(
         crud.phrase_all.create(db=db, obj_in=response)
         return response
 
-
     phrase_all_data = crud.phrase_all.get_by_keyword(db, keyword=keyword, database=database)
+
     if display_limit:
         if len(phrase_all_data) >= display_limit:
+            loop = asyncio.get_event_loop()
+            loop.create_task(crud.phrase_all.save_log(db, phrase_all_data[:display_limit], settings.RESPONSE_SOURCE_ROCKKWH))
             return phrase_all_data[:display_limit]
         else:
             return await update_from_serp_api(db, keyword, database, display_limit=display_limit)
     else:
         if len(phrase_all_data) > 0:
+            loop = asyncio.get_event_loop()
+            loop.create_task(crud.phrase_all.save_log(db, phrase_all_data, settings.RESPONSE_SOURCE_ROCKKWH))
             return phrase_all_data
         else:
             return await update_from_serp_api(db, keyword, database)
@@ -92,11 +97,15 @@ async def phrase_organic(
 
     if display_limit:
         if len(phrase_organic_data) >= display_limit:
+            loop = asyncio.get_event_loop()
+            loop.create_task(crud.phrase_organic.save_log(db, phrase_organic_data[:display_limit], settings.RESPONSE_SOURCE_ROCKKWH))
             return phrase_organic_data[:display_limit]
         else:
             return await update_from_serp_api(db, keyword, database, display_limit=display_limit)
     else:
         if len(phrase_organic_data) > 0:
+            loop = asyncio.get_event_loop()
+            loop.create_task(crud.phrase_organic.save_log(db, phrase_organic_data, settings.RESPONSE_SOURCE_ROCKKWH))
             return phrase_organic_data
         else:
             return await update_from_serp_api(db, keyword, database)
@@ -115,6 +124,8 @@ async def phrase_this(
     phrase_this_data = crud.phrase_this.get_by_keyword(db, keyword=keyword, database=database)
 
     if len(phrase_this_data) > 0:
+        loop = asyncio.get_event_loop()
+        loop.create_task(crud.phrase_this.save_log(db, phrase_this_data, settings.RESPONSE_SOURCE_ROCKKWH))
         return phrase_this_data
     else:
         response = []
@@ -172,11 +183,16 @@ async def phrase_related(
 
     if display_limit:
         if len(phrase_related_data) >= display_limit:
+            loop = asyncio.get_event_loop()
+            loop.create_task(crud.phrase_related.save_log(db, phrase_related_data[:display_limit],
+                                                          settings.RESPONSE_SOURCE_ROCKKWH))
             return phrase_related_data[:display_limit]
         else:
             return await update_from_serp_api(db, keyword, database, display_limit=display_limit)
     else:
         if len(phrase_related_data) > 0:
+            loop = asyncio.get_event_loop()
+            loop.create_task(crud.phrase_related.save_log(db, phrase_related_data, settings.RESPONSE_SOURCE_ROCKKWH))
             return phrase_related_data
         else:
             return await update_from_serp_api(db, keyword, database)
@@ -196,6 +212,8 @@ async def phrase_fullsearch(
     phrase_fullsearch_data = crud.phrase_fullsearch.get_by_keyword(db, keyword=keyword, database=database)
 
     if len(phrase_fullsearch_data) > 0:
+        loop = asyncio.get_event_loop()
+        loop.create_task(crud.phrase_fullsearch.save_log(db, phrase_fullsearch_data, settings.RESPONSE_SOURCE_ROCKKWH))
         return phrase_fullsearch_data
     else:
         response = []
@@ -231,6 +249,8 @@ async def phrase_adwords(
     phrase_adwords_data = crud.phrase_adwords.get_by_keyword(db, keyword=keyword, database=database)
 
     if len(phrase_adwords_data) > 0:
+        loop = asyncio.get_event_loop()
+        loop.create_task(crud.phrase_adwords.save_log(db, phrase_adwords_data, settings.RESPONSE_SOURCE_ROCKKWH))
         return phrase_adwords_data
     else:
         response = []
@@ -261,6 +281,9 @@ async def phrase_adwords_historical(
     phrase_adwords_historical_data = crud.phrase_adwords_historical.get_by_keyword(db, keyword=keyword, database=database)
 
     if len(phrase_adwords_historical_data) > 0:
+        loop = asyncio.get_event_loop()
+        loop.create_task(crud.phrase_adwords_historical.save_log(db, phrase_adwords_historical_data,
+                                                                 settings.RESPONSE_SOURCE_ROCKKWH))
         return phrase_adwords_historical_data
     else:
         response = []
@@ -296,6 +319,8 @@ async def phrase_kdi(
     phrase_kdi_data = crud.phrase_kdi.get_by_keyword(db, keyword=keyword, database=database)
 
     if len(phrase_kdi_data) > 0:
+        loop = asyncio.get_event_loop()
+        loop.create_task(crud.phrase_kdi.save_log(db, phrase_kdi_data, settings.RESPONSE_SOURCE_ROCKKWH))
         return phrase_kdi_data
     else:
         response = []
