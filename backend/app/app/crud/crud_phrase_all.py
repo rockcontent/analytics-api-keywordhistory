@@ -22,16 +22,16 @@ class CRUDPhraseAll(CRUDBase[PhraseAll, PhraseAllCreate, PhraseAllUpdate]):
             .all()
         )
 
-    def create(
-        self, db: Session, *, obj_in: List[PhraseAllCreate],
-    ) -> List[PhraseAll]:
-        for p in obj_in:
-            obj_in_data = jsonable_encoder(p)
-            db_obj = self.model(**obj_in_data)
-            db.add(db_obj)
-            db.commit()
-            db.refresh(db_obj)
-        return obj_in
+    # def create(
+    #     self, db: Session, *, obj_in: List[PhraseAllCreate],
+    # ) -> List[PhraseAll]:
+    #     for p in obj_in:
+    #         obj_in_data = jsonable_encoder(p)
+    #         db_obj = self.model(**obj_in_data)
+    #         db.add(db_obj)
+    #         db.commit()
+    #         db.refresh(db_obj)
+    #     return obj_in
 
 
 phrase_all = CRUDPhraseAll(PhraseAll)

@@ -17,3 +17,6 @@ class UrlOrganic(Base):
     number_results = Column(BigInteger, nullable=False, default=0)
     trends = Column(String, index=True, nullable=False)
     serp_features = Column(String, nullable=False, default=0)
+
+    def get_unit_value(self):
+        return 10

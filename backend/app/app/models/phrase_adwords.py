@@ -9,3 +9,6 @@ class PhraseAdwords(Base):
     visible_url = Column(String, index=True, nullable=False)
     keyword = Column(String, index=True, nullable=False)
     database = Column(String, index=True, nullable=False)
+
+    def get_unit_value(self):
+        return 20

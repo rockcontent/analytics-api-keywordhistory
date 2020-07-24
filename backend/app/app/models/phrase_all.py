@@ -11,3 +11,6 @@ class PhraseAll(Base):
     search_volume = Column(Integer, nullable=False, default=0)
     cpc = Column(DECIMAL, nullable=False, default=0.0)
     competition = Column(Integer, nullable=False, default=0)
+
+    def get_unit_value(self):
+        return 10
