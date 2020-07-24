@@ -32,7 +32,11 @@ class CRUDPhraseRelated(CRUDBase[PhraseRelated, PhraseRelatedCreate, PhraseRelat
     #         db.refresh(db_obj)
     #     return obj_in
 
+    def delete_by_keyword(self, db: Session, *, keyword: str, database: str) -> bool:
+        return (
+            db.query(PhraseRelated)
+            .filter(and_(PhraseRelated.keyword_search == keyword, PhraseRelated.database == database))
+            .delete()
+        )
+
 phrase_related = CRUDPhraseRelated(PhraseRelated)
-
-
-
