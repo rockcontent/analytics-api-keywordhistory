@@ -83,7 +83,7 @@ class Settings(BaseSettings):
     USERS_OPEN_REGISTRATION: bool = False
 
     #Graylog Server
-    GRAYLOG_SERVER: str = "172.31.42.20"
+    GRAYLOG_SERVER: str = "18.207.238.248"
     GRAYLOG_PORT: int = 12201
 
     #SEMRUSH TOKEN
