@@ -9,13 +9,15 @@ RUN curl -sSL https://raw.githubusercontent.com/python-poetry/poetry/master/get-
     poetry config virtualenvs.create false
 
 # Copy poetry.lock* in case it doesn't exist in the repo
-COPY ./app/pyproject.toml ./app/poetry.lock* /app/
+COPY ./backend/app/pyproject.toml ./backend/app/poetry.lock* /app/
 
 # Allow installing dev dependencies to run tests
 ARG INSTALL_DEV=false
 RUN poetry install --no-root --no-dev
 
-COPY ./app /app
+EXPOSE 80
+
+COPY ./backend/app /app
 
 #BACKEND
 ENV PYTHONPATH=/app
