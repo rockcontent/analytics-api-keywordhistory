@@ -1,74 +1,28 @@
-image: tiangolo/docker-with-compose
-
-before_script:
-  - docker login -u gitlab-ci-token -p $CI_JOB_TOKEN $CI_REGISTRY
-  - pip install docker-auto-labels
-
-stages:
-  - test
-  - build
-  - deploy
-
-tests:
-  stage: test
+sonar-develop:
+  image: PYTHON_IMG_WITH_SONAR_SCANNER
+  stage: sonar
   script:
-    - sh ./scripts/test.sh
-  tags:
-    - build
-    - test
+  - pip3 install -r requirements.txt
+  - pip3 install pytest pylint
+  - pytest --cov-branch --cov=app tests/ --cov-report xml:coverage.xml
+  - 'pylint --exit-zero app/ tests/ -r n --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" | tee pylint.txt'  - pylint app/ tests/ -r n --msg-template="{path}':'{line}':' [{msg_id}({symbol}), {obj}] {msg}" | tee pylint.txt'
+  - sonar-scanner -Dsonar.python.xunit.reportPath=nosetests.xml -Dsonar.python.coverage.reportPaths=coverage.xml
+    -- -Dsonar.sources=. -Dsonar.coverage.exclusions=**__init__**,tests/**,config.py,manage.py -Dsonar.exclusions=*.xml
+    -- -Dsonar.python.pylint.reportPath=pylint.txt -Dsonar.language=py
+    -- -Dsonar.host.url=http://23.20.60.195 
+    -- -Dsonar.projectKey=rockos-api-analytics
+    -- -Dsonar.login=354ba08b9a5cc6880eda8a8fd149ef412ebed81e
+    -- -Dsonar.gitlab.project_id=${CI_PROJECT_NAMESPACE}/$CI_PROJECT_ID
+    -- -Dsonar.projectName=${CI_PROJECT_NAMESPACE}-${CI_PROJECT_NAME}
+    -- -Dsonar.projectKey=${CI_PROJECT_NAMESPACE}-${CI_PROJECT_NAME}
+    -- -Dsonar.gitlab.commit_sha=$CI_COMMIT_SHA -Dsonar.gitlab.ref_name=$CI_COMMIT_REF_NAME
+    -- -Dsonar.gitlab.url=$CI_PROJECT_URL -Dsonar.gitlab.project_id=$CI_PROJECT_ID
 
-build-stag:
-  stage: build
-  script:
-    - TAG=stag FRONTEND_ENV=staging sh ./scripts/build-push.sh
   only:
-    - master
-  tags:
-    - build
-    - test
-    
-build-prod:
-  stage: build
-  script:
-    - TAG=prod FRONTEND_ENV=production sh ./scripts/build-push.sh
-  only:
-    - production
-  tags:
-    - build
-    - test
-
-deploy-stag:
-  stage: deploy
-  script: 
-    - >
-      DOMAIN=stag.keyword.history.rockcontent.com
-      TRAEFIK_TAG=stag.keyword.history.rockcontent.com
-      STACK_NAME=stag-keyword-history-rockcontent-com
-      TAG=stag
-      sh ./scripts/deploy.sh
-  environment:
-    name: staging
-    url: https://stag.keyword.history.rockcontent.com
-  only:
-    - master
-  tags:
-    - swarm
-    - stag
-
-deploy-prod:
-  stage: deploy
-  script:
-    - >
-      DOMAIN=keyword.history.rockcontent.com
-      TRAEFIK_TAG=keyword.history.rockcontent.com
-      STACK_NAME=keyword-history-rockcontent-com
-      TAG=prod
-      sh ./scripts/deploy.sh
-  environment:
-    name: production
-    url: https://keyword.history.rockcontent.com
-  only:
-    - production
-  tags:
-    - swarm
-    - prod
+    refs:
+      - develop
+      - merge_requests
+  except:
+    refs:
+      - tags
+  when: manual
