@@ -36,12 +36,7 @@ docker build:
   stage: build
   before_script:
     #- if [ "$CI_COMMIT_BRANCH" = "MixedAuthentication" ]; then REGION="sa-east-1" REPOSITORY_URL="$(echo 387838279136.dkr.ecr.sa-east-1.amazonaws.com/${CI_PROJECT_NAME}-${CI_COMMIT_BRANCH} | tr A-Z a-z)" ; fi
-    - if [ "$CI_COMMIT_BRANCH" = "development" ]; then 
-        POSTGRES_DATABASE=$POSTGRES_DB_DEV \
-        SERVER_NAME=$SERVER_NAME_DEV \
-        SERVER_HOST=$SERVER_HOST_DEV \
-        ; 
-      fi
+    - if [ "$CI_COMMIT_BRANCH" = "development" ]; then POSTGRES_DATABASE=$POSTGRES_DB_DEV SERVER_NAME=$SERVER_NAME_DEV SERVER_HOST=$SERVER_HOST_DEV ; fi
     - apk add --no-cache curl jq python3 py-pip
     - pip install awscli
     - $(aws ecr get-login --no-include-email --region "${REGION}")
