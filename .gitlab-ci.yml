@@ -1,28 +1,85 @@
-sonar-develop:
-  image: PYTHON_IMG_WITH_SONAR_SCANNER
-  stage: sonar
-  script:
-  - pip3 install -r requirements.txt
-  - pip3 install pytest pylint
-  - pytest --cov-branch --cov=app tests/ --cov-report xml:coverage.xml
-  - 'pylint --exit-zero app/ tests/ -r n --msg-template="{path}:{line}: [{msg_id}({symbol}), {obj}] {msg}" | tee pylint.txt'  - pylint app/ tests/ -r n --msg-template="{path}':'{line}':' [{msg_id}({symbol}), {obj}] {msg}" | tee pylint.txt'
-  - sonar-scanner -Dsonar.python.xunit.reportPath=nosetests.xml -Dsonar.python.coverage.reportPaths=coverage.xml
-    -- -Dsonar.sources=. -Dsonar.coverage.exclusions=**__init__**,tests/**,config.py,manage.py -Dsonar.exclusions=*.xml
-    -- -Dsonar.python.pylint.reportPath=pylint.txt -Dsonar.language=py
-    -- -Dsonar.host.url=http://23.20.60.195 
-    -- -Dsonar.projectKey=rockos-api-analytics
-    -- -Dsonar.login=354ba08b9a5cc6880eda8a8fd149ef412ebed81e
-    -- -Dsonar.gitlab.project_id=${CI_PROJECT_NAMESPACE}/$CI_PROJECT_ID
-    -- -Dsonar.projectName=${CI_PROJECT_NAMESPACE}-${CI_PROJECT_NAME}
-    -- -Dsonar.projectKey=${CI_PROJECT_NAMESPACE}-${CI_PROJECT_NAME}
-    -- -Dsonar.gitlab.commit_sha=$CI_COMMIT_SHA -Dsonar.gitlab.ref_name=$CI_COMMIT_REF_NAME
-    -- -Dsonar.gitlab.url=$CI_PROJECT_URL -Dsonar.gitlab.project_id=$CI_PROJECT_ID
+stages:
+  - stack
+  - build
+  - deploy
 
+image: docker:19.03.12
+
+services:
+  - docker:19.03.12-dind
+
+variables:
+  REPOSITORY_URL: 798853119042.dkr.ecr.us-east-1.amazonaws.com/${CI_PROJECT_NAME}-${CI_COMMIT_BRANCH}
+  REGION: us-east-1
+  TASK_DEFINTION_NAME: ${CI_PROJECT_NAME}-${CI_COMMIT_BRANCH}
+  CLUSTER_NAME: ${CI_PROJECT_NAME}-${CI_COMMIT_BRANCH}-cluster
+  SERVICE_NAME: ${CI_PROJECT_NAME}-${CI_COMMIT_BRANCH}-service
+  
+  FIRST_SUPERUSER_PASSWORD: $FIRST_SUPERUSER_PASSWORD
+  POSTGRES_DATABASE: $POSTGRES_DB_MASTER
+  POSTGRES_PASSWORD: $POSTGRES_PASSWORD
+  POSTGRES_SERVER: $POSTGRES_SERVER_MASTER
+  POSTGRES_USER: $POSTGRES_USER_MASTER
+  SECRET_KEY: $SECRET_KEY
+  SERVER_HOST: $SERVER_HOST_MASTER
+  SERVER_NAME: $SERVER_NAME_MASTER
+
+stack:
+  stage: stack
+  trigger:
+    include: .terraform/terraform-ci.yml
   only:
-    refs:
-      - develop
-      - merge_requests
-  except:
-    refs:
-      - tags
-  when: manual
+    - master
+    - development
+
+docker build:
+  stage: build
+  before_script:
+    #- if [ "$CI_COMMIT_BRANCH" = "MixedAuthentication" ]; then REGION="sa-east-1" REPOSITORY_URL="$(echo 387838279136.dkr.ecr.sa-east-1.amazonaws.com/${CI_PROJECT_NAME}-${CI_COMMIT_BRANCH} | tr A-Z a-z)" ; fi
+    - if [ "$CI_COMMIT_BRANCH" = "development" ]; then 
+        POSTGRES_DATABASE=$POSTGRES_DB_DEV \
+        SERVER_NAME=$SERVER_NAME_DEV \
+        SERVER_HOST=$SERVER_HOST_DEV \
+        ; 
+      fi
+    - apk add --no-cache curl jq python3 py-pip
+    - pip install awscli
+    - $(aws ecr get-login --no-include-email --region "${REGION}")
+    - IMAGE_TAG="$(echo $CI_COMMIT_SHA | head -c 8)"
+  script:
+    - |
+      docker build \
+      --build-arg POSTGRES_DATABASE=$POSTGRES_DATABASE \
+      --build-arg SERVER_NAME=$SERVER_NAME \
+      --build-arg SERVER_HOST=$SERVER_HOST \
+      --build-arg FIRST_SUPERUSER_PASSWORD=$FIRST_SUPERUSER_PASSWORD \
+      --build-arg POSTGRES_PASSWORD=$POSTGRES_PASSWORD \
+      --build-arg POSTGRES_SERVER=$POSTGRES_SERVER \
+      --build-arg POSTGRES_USER=$POSTGRES_USER \
+      --build-arg SECRET_KEY=$SECRET_KEY \
+      --build-arg CI_COMMIT_BRANCH=${CI_COMMIT_BRANCH} \
+      --build-arg CONNECTIONSTRINGS__PRODUCTION="$CONNECTIONSTRINGS__PRODUCTION" \
+      -t $REPOSITORY_URL .
+    - docker push $(echo $REPOSITORY_URL:latest | tr A-Z a-z)
+  only:
+    - master
+    - development
+
+deploy:
+  stage: deploy
+  before_script:
+    #- if [ "$CI_COMMIT_BRANCH" = "MixedAuthentication" ]; then REGION="sa-east-1" ; fi
+    - apk add --no-cache curl jq python3 py-pip
+    - pip install awscli
+    #- $(aws ecr get-login --no-include-email --region "${REGION}")
+    #- IMAGE_TAG="$(echo $CI_COMMIT_SHA | head -c 8)"
+  script:
+    # - TASK_DEFINITION=$(aws ecs describe-task-definition --task-definition "$TASK_DEFINTION_NAME" --region "${REGION}")
+    # - NEW_CONTAINER_DEFINTIION=$(echo $TASK_DEFINITION | python $CI_PROJECT_DIR/update_task_definition_image.py $REPOSITORY_URL:$IMAGE_TAG)
+    # - echo "Registering new container definition..."
+    # - aws ecs register-task-definition --region "${REGION}" --family "${TASK_DEFINTION_NAME}" --container-definitions "${NEW_CONTAINER_DEFINTIION}"
+    - echo "Updating the service..."
+    - aws ecs update-service --region "${REGION}" --cluster "$(echo ${CLUSTER_NAME}| tr A-Z a-z)" --service "$(echo ${SERVICE_NAME}| tr A-Z a-z)"  --task-definition "$(echo ${TASK_DEFINTION_NAME}| tr A-Z a-z)" --force-new-deployment
+  only:
+    - master
+    - development

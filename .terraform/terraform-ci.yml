@@ -1,0 +1,52 @@
+image:
+  name: hashicorp/terraform:0.12.29
+  entrypoint:
+    - '/usr/bin/env'
+    - 'PATH=/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin'
+
+before_script:
+  - cd .terraform
+  - terraform --version
+  - terraform init --backend-config="key=${CI_PROJECT_NAME}-${CI_COMMIT_BRANCH}/terraform.tfstate"
+
+stages:
+  - validate
+  - plan
+  - apply
+  - destroy
+
+validate:
+  stage: validate
+  script:
+    - terraform validate
+
+plan:
+  stage: plan
+  script:
+    - export TF_VAR_PROJECT="${CI_PROJECT_NAME}-${CI_COMMIT_BRANCH}"
+    - export TF_VAR_BRANCH="${CI_COMMIT_BRANCH}"
+    - terraform plan -out=../planfile
+  dependencies:
+    - validate
+  artifacts:
+    paths:
+      - planfile
+  when: manual
+
+apply:
+  stage: apply
+  script:
+    - terraform apply -input=false "../planfile" 
+  dependencies:
+    - plan
+  when: manual
+  
+destroy:
+  stage: destroy
+  script:
+    - export TF_VAR_PROJECT="${CI_PROJECT_NAME}-${CI_COMMIT_BRANCH}"
+    - export TF_VAR_BRANCH="${CI_COMMIT_BRANCH}"
+    - terraform destroy -input=false -auto-approve
+  dependencies:
+    - plan
+  when: manual

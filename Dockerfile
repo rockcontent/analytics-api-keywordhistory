@@ -13,6 +13,9 @@ COPY ./backend/app/pyproject.toml ./backend/app/poetry.lock* /app/
 
 # Allow installing dev dependencies to run tests
 ARG INSTALL_DEV=false
+ARG POSTGRES_DATABASE
+ARG SERVER_HOST
+ARG SERVER_NAME
 RUN poetry install --no-root --no-dev
 
 EXPOSE 80
@@ -36,7 +39,7 @@ ENV EMAILS_FROM_EMAIL=rock.analytics@rockcontent.com
 ENV USERS_OPEN_REGISTRATION=False
 ENV SENTRY_DSN=
 # Postgres
-ENV POSTGRES_SERVER=10.0.0.105
+ENV POSTGRES_SERVER=rockanalytics-instance-1.cyvphkpx16ip.us-east-1.rds.amazonaws.com
 ENV POSTGRES_USER=tulio
 ENV POSTGRES_PASSWORD=
-ENV POSTGRES_DB=keyword_history
+ENV POSTGRES_DB=POSTGRES_DATABASE
