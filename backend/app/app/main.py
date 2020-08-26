@@ -41,7 +41,7 @@ async def log_requests(request: Request, call_next):
     graylog.setLevel(logging.INFO)
     handler = graypy.GELFTCPHandler(settings.GRAYLOG_SERVER, settings.GRAYLOG_PORT)
     graylog.addHandler(handler)
-    adapter = logging.LoggerAdapter(logging.getLogger("api_log"), {"request": request.__dict__})
+    adapter = logging.LoggerAdapter(logging.getLogger(settings.GRAYLOG_FACILITY), {"request": request.__dict__})
     adapter.info(data)
     return response
 
@@ -56,7 +56,7 @@ async def catch_exceptions_middleware(request: Request, call_next):
         graylog.setLevel(logging.ERROR)
         handler = graypy.GELFTCPHandler(settings.GRAYLOG_SERVER, settings.GRAYLOG_PORT)
         graylog.addHandler(handler)
-        adapter = logging.LoggerAdapter(logging.getLogger("api_exception"), {"request": request.__dict__})
+        adapter = logging.LoggerAdapter(logging.getLogger(settings.GRAYLOG_EXCEPTION), {"request": request.__dict__})
         adapter.error(traceback.format_exc())
         return Response("Internal server error", status_code=500)
 
