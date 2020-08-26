@@ -24,8 +24,8 @@ variable "BRANCH" {
 variable "sub_domain_mapping" {
   description = "mapping subdomains for each branch"
   default = {
-    "master"  = "api.sem.rockcontent.com",
-    "development" = "apidev.sem.rockcontent.com"
+    "master"  = "apisem.rockcontent.com",
+    "development" = "apisemdev.rockcontent.com"
   }
 }
 variable "fargate_cpu_mapping" {
