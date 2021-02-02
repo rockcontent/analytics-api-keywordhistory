@@ -13,7 +13,7 @@ COPY ./backend/app/pyproject.toml ./backend/app/poetry.lock* /app/
 
 # Allow installing dev dependencies to run tests
 ARG INSTALL_DEV=false
-ARG POSTGRES_DATABASE
+ARG POSTGRES_DATABASE=keyword_history_dev
 ARG SERVER_HOST
 ARG SERVER_NAME
 ARG FIRST_SUPERUSER_PASSWORD
@@ -29,6 +29,9 @@ RUN poetry install --no-root --no-dev
 EXPOSE 80
 
 COPY ./backend/app /app
+COPY ./backend/app/newrelic.ini /app/
+COPY ./backend/app/start.sh /
+
 
 #BACKEND
 ENV PYTHONPATH=/app
@@ -52,3 +55,4 @@ ENV POSTGRES_SERVER=$POSTGRES_SERVER
 ENV POSTGRES_USER=$POSTGRES_USER
 ENV POSTGRES_PASSWORD=$POSTGRES_PASSWORD
 ENV POSTGRES_DB=$POSTGRES_DATABASE
+ENV NEW_RELIC_CONFIG_FILE=/app/newrelic.ini
